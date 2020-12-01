@@ -1,51 +1,45 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 import Youtube from "../apis/Youtube";
 import VideoList from "./VideoList";
 import VideoDetail from "./VideoDetail";
 
-class App extends React.Component {
-  state = { videos: [], selectedVideo: null };
+const App = () => {
+  const [videos, setVideos] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
-  componentDidMount() {
-    this.onEnterSubmit("React js");
-  }
+  useEffect(() => {
+    onEnterSubmit("React js");
+  }, []);
 
-  onEnterSubmit = async (searchText) => {
+  const onEnterSubmit = async (searchText) => {
     const resp = await Youtube.get("/search", {
       params: {
         q: searchText
       }
     });
-    this.setState({
-      videos: resp.data.items,
-      selectedVideo: resp.data.items[0]
-    });
+    setVideos(resp.data.items);
+    setSelectedVideo(resp.data.items[0]);
   };
 
-  selectedVideo = (video) => {
-    this.setState({ selectedVideo: video });
-  };
-  render() {
-    return (
-      <div className="ui container">
-        <SearchBar onFormSubmit={this.onEnterSubmit} />
-        <div className="ui grid">
-          <div className="ui row">
-            <div className="eleven wide column">
-              <VideoDetail video={this.state.selectedVideo} />
-            </div>
-            <div className="five wide column">
-              <VideoList
-                videos={this.state.videos}
-                onSelectVideo={this.selectedVideo}
-              />
-            </div>
+  return (
+    <div className="ui container">
+      <SearchBar onFormSubmit={onEnterSubmit} />
+      <div className="ui grid">
+        <div className="ui row">
+          <div className="eleven wide column">
+            <VideoDetail video={selectedVideo} />
+          </div>
+          <div className="five wide column">
+            <VideoList
+              videos={videos}
+              onSelectVideo={setSelectedVideo}
+            />
           </div>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default App;
